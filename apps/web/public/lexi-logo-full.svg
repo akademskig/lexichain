@@ -1,0 +1,35 @@
+<svg width="360" height="120" viewBox="0 0 360 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    LexiChain — Neon Futuristic (light background)
+    - Circle icon with LC interlock
+    - Cyan (#6EE7FF) + Violet (#B94EFF)
+    - Built-in "glow" via doubled strokes for contrast on white
+  -->
+
+  <style>
+    .text { font-family: 'Orbitron', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif; font-weight: 700; }
+  </style>
+
+  <!-- ICON (left) -->
+  <!-- Subtle shadow ring for contrast on light bg -->
+  <circle cx="60" cy="60" r="50" stroke="#0B0F14" stroke-opacity="0.12" stroke-width="10" fill="none" />
+  <!-- Cyan glow underlay -->
+  <circle cx="60" cy="60" r="50" stroke="#6EE7FF" stroke-opacity="0.35" stroke-width="12" fill="none" />
+  <!-- Cyan main ring -->
+  <circle cx="60" cy="60" r="50" stroke="#6EE7FF" stroke-width="6" fill="none" />
+
+  <!-- Interlocking LC shape (Violet curve) with glow -->
+  <path d="M40 65 Q60 20 80 65" stroke="#B94EFF" stroke-opacity="0.35" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M40 65 Q60 20 80 65" stroke="#B94EFF" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Interlocking LC shape (Cyan curve) with glow -->
+  <path d="M40 55 Q60 100 80 55" stroke="#6EE7FF" stroke-opacity="0.35" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M40 55 Q60 100 80 55" stroke="#6EE7FF" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- WORDMARK (right) -->
+  <!-- Slight shadow for readability on light bg -->
+  <text x="131" y="76" fill="#0B0F14" class="text" font-size="48" opacity="0.12">LexiChain</text>
+  <text x="130" y="75" class="text" font-size="48">
+    <tspan fill="#6EE7FF">Lexi</tspan><tspan fill="#B94EFF">Chain</tspan>
+  </text>
+</svg>

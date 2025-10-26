@@ -1,0 +1,25 @@
+<svg width="128" height="128" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    LexiChain — Neon Futuristic Light Icon
+    * Circle icon
+    * LC interlock
+    * Cyan/Violet neon glow
+    * Works on white backgrounds
+  -->
+
+  <!-- Subtle contrast ring -->
+  <circle cx="60" cy="60" r="50" stroke="#0B0F14" stroke-width="10" stroke-opacity="0.10" fill="none" />
+
+  <!-- Glow underlay -->
+  <circle cx="60" cy="60" r="50" stroke="#6EE7FF" stroke-opacity="0.35" stroke-width="12" fill="none" />
+
+  <!-- Main stroke -->
+  <circle cx="60" cy="60" r="50" stroke="#6EE7FF" stroke-width="6" fill="none" />
+
+  <!-- Interlocking LC shapes with glow -->
+  <path d="M40 65 Q60 20 80 65" stroke="#B94EFF" stroke-opacity="0.35" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M40 65 Q60 20 80 65" stroke="#B94EFF" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <path d="M40 55 Q60 100 80 55" stroke="#6EE7FF" stroke-opacity="0.35" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M40 55 Q60 100 80 55" stroke="#6EE7FF" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

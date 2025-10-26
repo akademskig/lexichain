@@ -15,7 +15,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  LinearProgress,
+  CircularProgress,
 } from "@mui/material";
 import {
   Search,
@@ -27,15 +27,56 @@ import {
   Delete,
   Public,
   Lock,
+  LibraryBooks,
 } from "@mui/icons-material";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Deck {
+  id: string;
+  title: string;
+  description: string | null;
+  language: string;
+  level: string | null;
+  cardCount: number;
+  isPublic: boolean;
+  author?: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+}
 
 export default function DecksPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterLanguage, setFilterLanguage] = useState("all");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
+  const [decks, setDecks] = useState<Deck[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch decks from API
+  useEffect(() => {
+    async function fetchDecks() {
+      try {
+        const params = new URLSearchParams();
+        if (searchQuery) params.append("search", searchQuery);
+        if (filterLanguage !== "all")
+          params.append("language", filterLanguage);
+
+        const response = await fetch(`/api/decks?${params}`);
+        if (response.ok) {
+          const data = await response.json();
+          setDecks(data);
+        }
+      } catch (error) {
+        console.error("Error fetching decks:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDecks();
+  }, [searchQuery, filterLanguage]);
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
@@ -50,88 +91,9 @@ export default function DecksPage() {
     setSelectedDeck(null);
   };
 
-  // Mock data - will be replaced with real data from API
-  const decks = [
-    {
-      id: "1",
-      title: "Spanish Basics",
-      description: "Essential Spanish vocabulary for beginners",
-      language: "Spanish",
-      level: "Beginner",
-      cardCount: 50,
-      progress: 65,
-      isPublic: true,
-      isOwner: true,
-      createdBy: "You",
-    },
-    {
-      id: "2",
-      title: "French Essentials",
-      description: "Common French phrases for travelers",
-      language: "French",
-      level: "Beginner",
-      cardCount: 45,
-      progress: 40,
-      isPublic: true,
-      isOwner: true,
-      createdBy: "You",
-    },
-    {
-      id: "3",
-      title: "Japanese Hiragana",
-      description: "Learn to read and write Hiragana characters",
-      language: "Japanese",
-      level: "Beginner",
-      cardCount: 46,
-      progress: 20,
-      isPublic: false,
-      isOwner: true,
-      createdBy: "You",
-    },
-    {
-      id: "4",
-      title: "German Grammar Basics",
-      description: "Essential German grammar rules and examples",
-      language: "German",
-      level: "Intermediate",
-      cardCount: 80,
-      progress: 0,
-      isPublic: true,
-      isOwner: false,
-      createdBy: "Community",
-    },
-    {
-      id: "5",
-      title: "Italian Food Vocabulary",
-      description: "Learn Italian words related to food and dining",
-      language: "Italian",
-      level: "Beginner",
-      cardCount: 60,
-      progress: 0,
-      isPublic: true,
-      isOwner: false,
-      createdBy: "Community",
-    },
-  ];
-
-  const languages = [
-    "all",
-    "Spanish",
-    "French",
-    "Japanese",
-    "German",
-    "Italian",
-  ];
-
-  const filteredDecks = decks.filter((deck) => {
-    const matchesSearch =
-      deck.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      deck.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLanguage =
-      filterLanguage === "all" || deck.language === filterLanguage;
-    return matchesSearch && matchesLanguage;
-  });
-
+  // Get unique languages for filter
+  const languages = ["all", ...new Set(decks.map((d) => d.language))];
+  console.log(decks)
   return (
     <Container maxWidth="xl">
       {/* Header */}
@@ -201,149 +163,137 @@ export default function DecksPage() {
       </Card>
 
       {/* Decks Grid */}
-      <Grid container spacing={3}>
-        {filteredDecks.map((deck) => (
-          <Grid key={deck.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-            <Card
-              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+      {loading && (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 8, width: "100%" }}>
+          <CircularProgress />
+        </Box>
+      )}
+
+      {!loading && decks.length === 0 && (
+        <Card sx={{ width: "100%" }}>
+          <CardContent sx={{ textAlign: "center", py: 8 }}>
+            <LibraryBooks sx={{ fontSize: 80, color: "text.secondary", mb: 2 }} />
+            <Typography variant="h6" gutterBottom>
+              No decks found
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              {searchQuery || filterLanguage !== "all"
+                ? "Try adjusting your filters"
+                : "Create your first deck to get started"}
+            </Typography>
+            <Button
+              component={Link}
+              href="/decks/new"
+              variant="contained"
+              startIcon={<Add />}
             >
-              <CardContent sx={{ flexGrow: 1 }}>
-                {/* Header with menu */}
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="flex-start"
-                  sx={{ mb: 2 }}
-                >
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" fontWeight={600} gutterBottom>
-                      {deck.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 2 }}
-                    >
-                      {deck.description}
-                    </Typography>
-                  </Box>
-                  {deck.isOwner && (
+              Create Deck
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {!loading && decks.length > 0 && (
+        <Grid container spacing={3}>
+          {decks.map((deck) => (
+            <Grid key={deck.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+              <Card
+                sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+              >
+                <CardContent sx={{ flexGrow: 1 }}>
+                  {/* Header with menu */}
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                    sx={{ mb: 2 }}
+                  >
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" fontWeight={600} gutterBottom>
+                        {deck.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 2 }}
+                      >
+                        {deck.description}
+                      </Typography>
+                    </Box>
                     <IconButton
                       size="small"
                       onClick={(e) => handleMenuOpen(e, deck.id)}
                     >
                       <MoreVert />
                     </IconButton>
-                  )}
-                </Stack>
+                  </Stack>
 
-                {/* Tags */}
-                <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                  <Chip
-                    label={deck.language}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                  />
-                  <Chip label={deck.level} size="small" variant="outlined" />
-                  <Chip
-                    icon={
-                      deck.isPublic ? (
-                        <Public fontSize="small" />
-                      ) : (
-                        <Lock fontSize="small" />
-                      )
-                    }
-                    label={deck.isPublic ? "Public" : "Private"}
-                    size="small"
-                    variant="outlined"
-                  />
-                </Stack>
-
-                {/* Stats */}
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  sx={{ mb: 2 }}
-                >
-                  <Typography variant="caption" color="text.secondary">
-                    {deck.cardCount} cards
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    by {deck.createdBy}
-                  </Typography>
-                </Stack>
-
-                {/* Progress */}
-                {deck.progress > 0 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      sx={{ mb: 0.5 }}
-                    >
-                      <Typography variant="caption" color="text.secondary">
-                        Progress
-                      </Typography>
-                      <Typography variant="caption" fontWeight={600}>
-                        {deck.progress}%
-                      </Typography>
-                    </Stack>
-                    <LinearProgress
-                      variant="determinate"
-                      value={deck.progress}
-                      sx={{ height: 6, borderRadius: 3 }}
+                  {/* Tags */}
+                  <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 2, gap: 1 }}>
+                    <Chip
+                      label={deck.language}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
                     />
-                  </Box>
-                )}
+                    {deck.level && (
+                      <Chip label={deck.level} size="small" variant="outlined" />
+                    )}
+                    <Chip
+                      icon={
+                        deck.isPublic ? (
+                          <Public fontSize="small" />
+                        ) : (
+                          <Lock fontSize="small" />
+                        )
+                      }
+                      label={deck.isPublic ? "Public" : "Private"}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </Stack>
 
-                {/* Actions */}
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    component={Link}
-                    href={`/study/${deck.id}`}
-                    variant="contained"
-                    fullWidth
-                    startIcon={<PlayArrow />}
+                  {/* Stats */}
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    sx={{ mb: 2 }}
                   >
-                    Study
-                  </Button>
-                  <Button
-                    component={Link}
-                    href={`/decks/${deck.id}`}
-                    variant="outlined"
-                    fullWidth
-                  >
-                    View
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                    <Typography variant="caption" color="text.secondary">
+                      {deck.cardCount} cards
+                    </Typography>
+                    {deck.author && (
+                      <Typography variant="caption" color="text.secondary">
+                        by {deck.author.name || "Anonymous"}
+                      </Typography>
+                    )}
+                  </Stack>
 
-      {/* Empty State */}
-      {filteredDecks.length === 0 && (
-        <Box sx={{ textAlign: "center", py: 8 }}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            No decks found
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {searchQuery || filterLanguage !== "all"
-              ? "Try adjusting your search or filters"
-              : "Create your first deck to get started"}
-          </Typography>
-          <Button
-            component={Link}
-            href="/decks/new"
-            variant="contained"
-            startIcon={<Add />}
-          >
-            Create Deck
-          </Button>
-        </Box>
+                  {/* Actions */}
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      component={Link}
+                      href={`/study/${deck.id}`}
+                      variant="contained"
+                      fullWidth
+                      startIcon={<PlayArrow />}
+                    >
+                      Study
+                    </Button>
+                    <Button
+                      component={Link}
+                      href={`/decks/${deck.id}`}
+                      variant="outlined"
+                      fullWidth
+                    >
+                      View
+                    </Button>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       )}
 
       {/* Deck Menu */}

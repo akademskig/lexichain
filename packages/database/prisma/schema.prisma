@@ -263,11 +263,15 @@ model Card {
 model CourseProgress {
   id String @id @default(cuid())
 
-  // User & Course
+  // User & Course (CourseProgress = Enrollment)
   userId   String
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   courseId String
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Enrollment
+  isEnrolled Boolean  @default(true)
+  enrolledAt DateTime @default(now())
 
   // Progress stats
   sectionsCompleted Int @default(0)
@@ -291,6 +295,7 @@ model CourseProgress {
   @@unique([userId, courseId])
   @@index([userId])
   @@index([courseId])
+  @@index([userId, isEnrolled])
 }
 
 model DeckProgress {

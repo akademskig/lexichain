@@ -68,7 +68,7 @@ export async function GET(request: Request) {
             title: deck.title,
             description: deck.description,
             language: deck.language,
-            level: deck.level,
+            difficulty: deck.difficulty,
             cardCount: deck._count.cards,
             isPublic: deck.isPublic,
             createdAt: deck.createdAt,
@@ -95,7 +95,19 @@ export async function POST(request: Request) {
         const { title, description, language, level, isPublic, sectionId } = body;
 
         // TODO: Get userId from session when auth is implemented
-        const userId = "cm4gvlj5i0000kgoilzs6yd0i"; // Temporary hardcoded user
+        // For now, get the demo user by email
+        const user = await prisma.user.findUnique({
+            where: { email: "demo@lexichain.com" },
+        });
+
+        if (!user) {
+            return NextResponse.json(
+                { error: "User not found" },
+                { status: 404 },
+            );
+        }
+
+        const userId = user.id;
 
         // Validate required fields
         if (!title || !language || !sectionId) {
@@ -110,7 +122,7 @@ export async function POST(request: Request) {
                 title,
                 description,
                 language,
-                level: level || "Beginner",
+                requiredLevel: level || 0,
                 isPublic: isPublic ?? true,
                 userId,
                 sectionId,

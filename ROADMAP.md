@@ -14,12 +14,25 @@ Brand Style: **Neon Futuristic** (dark-mode first)
 
 🎯 Goal: A fully usable learning app with verifiable progress
 
+### Completed ✅
+- ✅ Neon futuristic UI theme (Material UI v7)
+- ✅ Database schema with Prisma + PostgreSQL (Docker)
+- ✅ Course/Section/Deck hierarchy (strict - no standalone decks)
+- ✅ Enrollment system with progress tracking
+- ✅ Dashboard with enrolled courses
+- ✅ Course browsing page with enrollment indicators
+- ✅ Study session interface with flashcards
+- ✅ SM-2 Spaced Repetition System (basic implementation)
+- ✅ Web Speech API for pronunciation
+- ✅ Experience/Level system
+- ✅ Responsive layout (mobile-first)
+- ✅ Reusable CourseCard component
+
+### In Progress 🚧
 - Auth: Email/passkey onboarding + optional wallet
-- Deck & flashcard system with SM-2 SRS
 - Module completion → on-chain badge or EAS attestation (gasless)
 - IPFS deck publishing
-- User profile with achievements
-- Neon futuristic UI theme
+- User profile with achievements (page created, needs data)
 
 ✅ Target completion: ~4–6 weeks
 

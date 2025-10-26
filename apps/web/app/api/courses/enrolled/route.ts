@@ -1,33 +1,34 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@repo/database";
 
-// GET /api/courses - Fetch all courses
-export async function GET(request: Request) {
+// GET /api/courses/enrolled - Fetch only enrolled courses for the current user
+export async function GET() {
     try {
-        const { searchParams } = new URL(request.url);
-        const language = searchParams.get("language");
-        const difficulty = searchParams.get("difficulty");
-
         // TODO: Get userId from session when auth is implemented
         // For now, get the demo user by email
         const user = await prisma.user.findUnique({
             where: { email: "demo@lexichain.com" },
         });
 
-        const userId = user?.id || "";
-
-        const where: Record<string, unknown> = { isPublished: true };
-
-        if (language) {
-            where.language = language;
+        if (!user) {
+            return NextResponse.json(
+                { error: "User not found" },
+                { status: 404 },
+            );
         }
 
-        if (difficulty) {
-            where.difficulty = difficulty;
-        }
+        const userId = user.id;
 
-        const courses = await prisma.course.findMany({
-            where,
+        // Fetch courses where user has CourseProgress (enrolled)
+        const enrolledCourses = await prisma.course.findMany({
+            where: {
+                courseProgress: {
+                    some: {
+                        userId,
+                        isEnrolled: true,
+                    },
+                },
+            },
             include: {
                 _count: {
                     select: { sections: true },
@@ -45,22 +46,27 @@ export async function GET(request: Request) {
                         isEnrolled: true,
                     },
                     select: {
-                        isEnrolled: true,
                         enrolledAt: true,
                         sectionsCompleted: true,
                         decksCompleted: true,
+                        cardsLearned: true,
+                        totalReviews: true,
                         experienceGained: true,
                         isCompleted: true,
+                        completedAt: true,
+                        lastStudiedAt: true,
                     },
                 },
             },
             orderBy: {
-                createdAt: "desc",
+                courseProgress: {
+                    _count: "desc", // Most recently enrolled first
+                },
             },
         });
 
         // Transform response
-        const transformedCourses = courses.map((course) => ({
+        const transformedCourses = enrolledCourses.map((course) => ({
             id: course.id,
             title: course.title,
             description: course.description,
@@ -73,17 +79,18 @@ export async function GET(request: Request) {
             totalSections: course._count.sections,
             totalDecks: course.totalDecks,
             totalCards: course.totalCards,
+            isEnrolled: true, // All courses from this endpoint are enrolled
             author: course.user,
-            isEnrolled: course.courseProgress.length > 0,
             courseProgress: course.courseProgress,
         }));
 
         return NextResponse.json(transformedCourses);
     } catch (error) {
-        console.error("Error fetching courses:", error);
+        console.error("Error fetching enrolled courses:", error);
         return NextResponse.json(
-            { error: "Failed to fetch courses" },
+            { error: "Failed to fetch enrolled courses" },
             { status: 500 },
         );
     }
 }
+

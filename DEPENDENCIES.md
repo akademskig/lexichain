@@ -124,6 +124,7 @@ npm install --save-dev @testing-library/react @testing-library/jest-dom vitest
 ## Installation Order
 
 ### Phase 1: Foundation (Install Now)
+
 ```bash
 # From root directory
 cd /home/marta/personal/lexichain
@@ -153,6 +154,7 @@ npx prisma init
 ```
 
 ### Phase 2: Authentication (Install Later)
+
 ```bash
 cd apps/web
 npm install next-auth @auth/prisma-adapter @simplewebauthn/server @simplewebauthn/browser bcryptjs
@@ -160,6 +162,7 @@ npm install -D @types/bcryptjs
 ```
 
 ### Phase 3: Web3 & IPFS (Install Later)
+
 ```bash
 cd apps/web
 npm install wagmi viem @tanstack/react-query @web3modal/wagmi
@@ -238,4 +241,3 @@ cd apps/web && npm list --depth=0
 3. Configure NextAuth
 4. Create base UI components
 5. Set up Web3 providers
-

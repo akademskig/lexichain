@@ -1,4 +1,3 @@
-
 ---
 
 ## ✅ Updated `ROADMAP.md`
@@ -65,12 +64,12 @@ Brand Style: **Neon Futuristic** (dark-mode first)
 
 ## Milestones
 
-| Phase | Duration | Status |
-|------|----------|--------|
-| Phase 1 — MVP | 4–6 weeks | In progress |
-| Phase 2 — Community | 6–8 weeks | Pending |
-| Phase 3 — AI Tools | 4–6 weeks | Pending |
-| Phase 4 — Credentials | 8–12 weeks | Pending |
+| Phase                 | Duration   | Status      |
+| --------------------- | ---------- | ----------- |
+| Phase 1 — MVP         | 4–6 weeks  | In progress |
+| Phase 2 — Community   | 6–8 weeks  | Pending     |
+| Phase 3 — AI Tools    | 4–6 weeks  | Pending     |
+| Phase 4 — Credentials | 8–12 weeks | Pending     |
 
 ---
 

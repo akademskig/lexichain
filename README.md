@@ -3,6 +3,7 @@
 LexiChain is a modern language learning platform where progress is not only tracked — it’s **owned**.
 
 We combine:
+
 - **AI-powered vocabulary growth**
 - **Spaced Repetition System (SRS)** for lasting memory
 - **On-chain verifiable achievements**
@@ -27,15 +28,15 @@ We combine:
 
 ## 🧱 Tech Stack
 
-| Area | Tech |
-|------|------|
+| Area     | Tech                              |
+| -------- | --------------------------------- |
 | Frontend | Next.js 14+, React 18, TypeScript |
-| UI | Tailwind, shadcn/ui |
-| State | Zustand + TanStack Query |
-| Database | Prisma + Postgres |
-| Web3 | Wagmi + Viem, OpenZeppelin |
-| Chain | Polygon / Base for low gas |
-| Storage | IPFS (web3.storage / Pinata) |
+| UI       | Tailwind, shadcn/ui               |
+| State    | Zustand + TanStack Query          |
+| Database | Prisma + Postgres                 |
+| Web3     | Wagmi + Viem, OpenZeppelin        |
+| Chain    | Polygon / Base for low gas        |
+| Storage  | IPFS (web3.storage / Pinata)      |
 
 ---
 
@@ -47,7 +48,6 @@ Next.js (App + API)
 ⤷ Prisma + PostgreSQL
 ⤷ Wagmi + Gasless relayer
 ⤷ IPFS for deck publishing
-
 
 Progress is tracked off-chain; **achievement proofs** are minted on-chain only when earned.
 
@@ -100,3 +100,4 @@ Verifiable skill certificates for careers
 📜 License
 
 MIT — made for builders and learners.
+```

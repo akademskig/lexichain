@@ -62,6 +62,7 @@ npm run dev
 ```
 
 The app will be available at:
+
 - Web app: http://localhost:3000
 - Docs: http://localhost:3001
 
@@ -83,30 +84,36 @@ lexichain/
 ## Tech Stack
 
 ### Core
+
 - **Framework**: Next.js 16 with React 19
 - **Language**: TypeScript
 - **Monorepo**: Turborepo
 - **Styling**: Tailwind CSS (to be added)
 
 ### Database & Backend
+
 - **Database**: PostgreSQL
 - **ORM**: Prisma (to be added)
 - **API**: Next.js API Routes / tRPC (to be added)
 
 ### Authentication
+
 - **Auth**: NextAuth.js (to be added)
 - **Passkeys**: SimpleWebAuthn (to be added)
 - **Web3**: WalletConnect / RainbowKit (to be added)
 
 ### Blockchain
+
 - **Attestations**: Ethereum Attestation Service (EAS)
 - **Blockchain Library**: Viem / Ethers.js (to be added)
 - **Gasless Transactions**: Gelato / Biconomy (to be added)
 
 ### Storage
+
 - **IPFS**: Pinata or Web3.Storage (to be added)
 
 ### UI/UX
+
 - **Components**: Radix UI / shadcn/ui (to be added)
 - **Animations**: Framer Motion (to be added)
 - **Icons**: Lucide React (to be added)
@@ -156,12 +163,14 @@ npm run dev --filter=docs
 ## Troubleshooting
 
 ### Port already in use
+
 ```bash
 # Kill process on port 3000
 lsof -ti:3000 | xargs kill -9
 ```
 
 ### Database connection issues
+
 ```bash
 # Check PostgreSQL is running
 pg_isready
@@ -171,8 +180,8 @@ sudo systemctl restart postgresql
 ```
 
 ### Clear Next.js cache
+
 ```bash
 rm -rf .next
 npm run dev
 ```
-

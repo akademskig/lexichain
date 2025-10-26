@@ -37,13 +37,20 @@ model User {
   longestStreak Int       @default(0)
   lastReviewAt  DateTime?
 
+  // Experience & Level System
+  experience   Int @default(0)
+  level        Int @default(1)
+  nextLevelExp Int @default(100) // XP needed for next level
+
   // Relations
-  accounts     Account[]
-  sessions     Session[]
-  decks        Deck[]
-  reviews      Review[]
-  achievements Achievement[]
-  deckProgress DeckProgress[]
+  accounts       Account[]
+  sessions       Session[]
+  courses        Course[]
+  decks          Deck[]
+  reviews        Review[]
+  achievements   Achievement[]
+  deckProgress   DeckProgress[]
+  courseProgress CourseProgress[]
 
   @@index([email])
   @@index([walletAddress])
@@ -88,15 +95,107 @@ model VerificationToken {
 }
 
 // ============================================
-// DECKS & FLASHCARDS
+// COURSES, SECTIONS & DECKS
 // ============================================
+
+model Course {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  language    String // e.g., "Spanish", "French", "Japanese"
+
+  // Metadata
+  icon        String? // Emoji or icon identifier
+  color       String? // Hex color for UI
+  isPublic    Boolean @default(true)
+  isPublished Boolean @default(false)
+
+  // Difficulty & Experience
+  difficulty     String @default("Beginner") // Beginner, Intermediate, Advanced
+  requiredLevel  Int    @default(0) // Minimum user level to access
+  experienceGain Int    @default(10) // XP gained per completed deck
+
+  // Stats
+  totalDecks     Int   @default(0)
+  totalCards     Int   @default(0)
+  enrolledCount  Int   @default(0)
+  completionRate Float @default(0)
+
+  // Ownership
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  // Relations
+  sections       Section[]
+  courseProgress CourseProgress[]
+
+  @@index([userId])
+  @@index([language])
+  @@index([isPublic])
+  @@index([difficulty])
+}
+
+model Section {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+
+  // Course relationship
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Ordering
+  order Int @default(0)
+
+  // Difficulty progression
+  difficulty     String @default("Beginner")
+  requiredLevel  Int    @default(0)
+  experienceGain Int    @default(5)
+
+  // Unlock logic
+  isLocked    Boolean @default(false)
+  unlockAfter String? // ID of section that must be completed first
+
+  // Stats
+  deckCount      Int   @default(0)
+  cardCount      Int   @default(0)
+  completionRate Float @default(0)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  decks Deck[]
+
+  @@index([courseId])
+  @@index([courseId, order])
+}
 
 model Deck {
   id          String  @id @default(cuid())
   title       String
   description String?
-  language    String // e.g., "Spanish", "French", "Japanese"
-  level       String? // e.g., "Beginner", "Intermediate", "Advanced"
+
+  // Section relationship (REQUIRED - must belong to a section)
+  sectionId String
+  section   Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  // Language (inherited from course via section)
+  language String // e.g., "Spanish", "French", "Japanese"
+
+  // Difficulty & Experience
+  difficulty     String @default("Beginner")
+  requiredLevel  Int    @default(0)
+  experienceGain Int    @default(10)
+
+  // Ordering within section
+  order Int @default(0)
 
   // Metadata
   isPublic    Boolean @default(false)
@@ -121,9 +220,11 @@ model Deck {
   progress DeckProgress[]
 
   @@index([userId])
+  @@index([sectionId])
   @@index([language])
   @@index([isPublic])
   @@index([ipfsHash])
+  @@index([sectionId, order])
 }
 
 model Card {
@@ -158,6 +259,39 @@ model Card {
 // ============================================
 // SPACED REPETITION & PROGRESS
 // ============================================
+
+model CourseProgress {
+  id String @id @default(cuid())
+
+  // User & Course
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Progress stats
+  sectionsCompleted Int @default(0)
+  decksCompleted    Int @default(0)
+  cardsLearned      Int @default(0)
+  totalReviews      Int @default(0)
+  experienceGained  Int @default(0)
+
+  // Completion
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+
+  // Current position
+  currentSectionId String?
+  currentDeckId    String?
+
+  // Timestamps
+  startedAt     DateTime  @default(now())
+  lastStudiedAt DateTime?
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
 
 model DeckProgress {
   id String @id @default(cuid())

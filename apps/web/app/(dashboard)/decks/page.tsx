@@ -61,8 +61,7 @@ export default function DecksPage() {
       try {
         const params = new URLSearchParams();
         if (searchQuery) params.append("search", searchQuery);
-        if (filterLanguage !== "all")
-          params.append("language", filterLanguage);
+        if (filterLanguage !== "all") params.append("language", filterLanguage);
 
         const response = await fetch(`/api/decks?${params}`);
         if (response.ok) {
@@ -93,7 +92,7 @@ export default function DecksPage() {
 
   // Get unique languages for filter
   const languages = ["all", ...new Set(decks.map((d) => d.language))];
-  console.log(decks)
+  console.log(decks);
   return (
     <Container maxWidth="xl">
       {/* Header */}
@@ -164,7 +163,14 @@ export default function DecksPage() {
 
       {/* Decks Grid */}
       {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 8, width: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            py: 8,
+            width: "100%",
+          }}
+        >
           <CircularProgress />
         </Box>
       )}
@@ -172,7 +178,9 @@ export default function DecksPage() {
       {!loading && decks.length === 0 && (
         <Card sx={{ width: "100%" }}>
           <CardContent sx={{ textAlign: "center", py: 8 }}>
-            <LibraryBooks sx={{ fontSize: 80, color: "text.secondary", mb: 2 }} />
+            <LibraryBooks
+              sx={{ fontSize: 80, color: "text.secondary", mb: 2 }}
+            />
             <Typography variant="h6" gutterBottom>
               No decks found
             </Typography>
@@ -198,7 +206,11 @@ export default function DecksPage() {
           {decks.map((deck) => (
             <Grid key={deck.id} size={{ xs: 12, sm: 6, lg: 4 }}>
               <Card
-                sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
               >
                 <CardContent sx={{ flexGrow: 1 }}>
                   {/* Header with menu */}
@@ -229,7 +241,12 @@ export default function DecksPage() {
                   </Stack>
 
                   {/* Tags */}
-                  <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 2, gap: 1 }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    flexWrap="wrap"
+                    sx={{ mb: 2, gap: 1 }}
+                  >
                     <Chip
                       label={deck.language}
                       size="small"
@@ -237,7 +254,11 @@ export default function DecksPage() {
                       variant="outlined"
                     />
                     {deck.level && (
-                      <Chip label={deck.level} size="small" variant="outlined" />
+                      <Chip
+                        label={deck.level}
+                        size="small"
+                        variant="outlined"
+                      />
                     )}
                     <Chip
                       icon={

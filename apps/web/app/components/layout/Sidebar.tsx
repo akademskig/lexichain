@@ -20,6 +20,7 @@ import {
   EmojiEvents,
   Add,
   LocalFireDepartment,
+  School,
 } from "@mui/icons-material";
 import Image from "next/image";
 import Link from "next/link";
@@ -49,6 +50,7 @@ export function Sidebar({
 
   const menuItems = [
     { text: "Dashboard", icon: <Dashboard />, href: "/dashboard" },
+    { text: "Courses", icon: <School />, href: "/courses" },
     { text: "My Decks", icon: <LibraryBooks />, href: "/decks" },
     { text: "Achievements", icon: <EmojiEvents />, href: "/achievements" },
     { text: "Profile", icon: <Person />, href: "/profile" },

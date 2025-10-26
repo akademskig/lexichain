@@ -55,6 +55,7 @@ Successfully connected the LexiChain frontend to the PostgreSQL database through
 ## Database Schema
 
 The app uses the following models:
+
 - `User` - User accounts and learning stats
 - `Deck` - Language learning decks
 - `Card` - Flashcards with front/back/pronunciation/example
@@ -65,21 +66,25 @@ The app uses the following models:
 ## How to Test
 
 1. **Start PostgreSQL** (if not running):
+
    ```bash
    docker-compose up -d
    ```
 
 2. **Run database migrations**:
+
    ```bash
    npm run db:push
    ```
 
 3. **Seed the database** (if not done):
+
    ```bash
    npm run db:seed
    ```
 
 4. **Start the dev server**:
+
    ```bash
    npm run dev --filter=web
    ```
@@ -105,6 +110,7 @@ The following features are ready to be built:
 ### API Response Format
 
 **Deck List:**
+
 ```json
 [
   {
@@ -125,6 +131,7 @@ The following features are ready to be built:
 ```
 
 **Deck with Cards:**
+
 ```json
 {
   "id": "cm4gvlj5i0001kgoilzs6yd0j",
@@ -163,4 +170,3 @@ DATABASE_URL="postgresql://lexichain:password@localhost:5435/lexichain"
 **Status**: ✅ Backend Integration Complete
 **Date**: 2025-10-26
 **Next**: Authentication System or Deck Management
-

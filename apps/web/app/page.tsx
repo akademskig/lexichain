@@ -72,6 +72,7 @@ export default function Home() {
           sx={{ mb: 8 }}
         >
           <Button
+            href="/dashboard"
             variant="contained"
             size="large"
             sx={{ px: 4, py: 1.5, fontSize: "1.1rem" }}
@@ -79,6 +80,7 @@ export default function Home() {
             Get Started
           </Button>
           <Button
+            href="/decks"
             variant="outlined"
             size="large"
             sx={{ px: 4, py: 1.5, fontSize: "1.1rem" }}

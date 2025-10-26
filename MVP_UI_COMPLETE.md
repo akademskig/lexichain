@@ -49,6 +49,7 @@
 ## Features Implemented
 
 ### 🎨 Design System
+
 - ✅ Neon futuristic theme (cyan/magenta)
 - ✅ Dark mode first
 - ✅ Material UI v7 components
@@ -57,6 +58,7 @@
 - ✅ Consistent spacing and typography
 
 ### 🧭 Navigation
+
 - ✅ Sidebar with user profile
 - ✅ Active page highlighting
 - ✅ Mobile drawer
@@ -64,6 +66,7 @@
 - ✅ Quick actions
 
 ### 📊 Data Display
+
 - ✅ Stats cards
 - ✅ Progress bars
 - ✅ Chip badges
@@ -71,6 +74,7 @@
 - ✅ Empty states
 
 ### 🎴 Flashcard System
+
 - ✅ Card flip animation
 - ✅ Front/back display
 - ✅ Pronunciation
@@ -79,6 +83,7 @@
 - ✅ Quality ratings
 
 ### 🏆 Gamification
+
 - ✅ Streak tracking
 - ✅ Achievements
 - ✅ Progress tracking
@@ -113,13 +118,13 @@ apps/web/app/
 
 ## Routes
 
-| Route | Page | Status |
-|-------|------|--------|
-| `/` | Landing | ✅ |
-| `/dashboard` | Dashboard Home | ✅ |
-| `/decks` | Decks Library | ✅ |
-| `/study/[deckId]` | Study Session | ✅ |
-| `/profile` | Profile | ✅ |
+| Route             | Page           | Status |
+| ----------------- | -------------- | ------ |
+| `/`               | Landing        | ✅     |
+| `/dashboard`      | Dashboard Home | ✅     |
+| `/decks`          | Decks Library  | ✅     |
+| `/study/[deckId]` | Study Session  | ✅     |
+| `/profile`        | Profile        | ✅     |
 
 ## Tech Stack
 
@@ -202,6 +207,7 @@ npm run db:studio
 ## Screenshots Checklist
 
 Test these features:
+
 - [ ] Landing page with neon theme
 - [ ] Dashboard with stats cards
 - [ ] Sidebar navigation (desktop)
@@ -216,6 +222,7 @@ Test these features:
 ## Known Limitations (Using Mock Data)
 
 Currently using mock data for:
+
 - User information
 - Deck lists
 - Flashcards
@@ -236,6 +243,7 @@ Currently using mock data for:
 ## Browser Support
 
 Tested on:
+
 - Chrome/Edge (Chromium)
 - Firefox
 - Safari (WebKit)
@@ -253,6 +261,7 @@ Tested on:
 ## 🎊 Congratulations!
 
 The MVP UI is complete! You now have:
+
 - 6 fully functional pages
 - Beautiful neon futuristic design
 - Responsive layouts
@@ -275,4 +284,3 @@ Ready to connect to the database and make it fully functional! 🚀
 5. Build deck/card CRUD operations
 
 The foundation is solid - now let's make it real! 💪
-

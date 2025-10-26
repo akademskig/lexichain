@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// LexiChain Database Schema
+// Language learning platform with blockchain-verified credentials
 
 generator client {
   provider = "prisma-client-js"
@@ -13,3 +10,260 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  password      String? // For email/password auth
+  
+  // Web3 / Wallet
+  walletAddress String?   @unique
+  
+  // Profile
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Learning Stats
+  totalReviews  Int       @default(0)
+  currentStreak Int       @default(0)
+  longestStreak Int       @default(0)
+  lastReviewAt  DateTime?
+  
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  decks         Deck[]
+  reviews       Review[]
+  achievements  Achievement[]
+  deckProgress  DeckProgress[]
+  
+  @@index([email])
+  @@index([walletAddress])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// DECKS & FLASHCARDS
+// ============================================
+
+model Deck {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  language    String   // e.g., "Spanish", "French", "Japanese"
+  level       String?  // e.g., "Beginner", "Intermediate", "Advanced"
+  
+  // Metadata
+  isPublic    Boolean  @default(false)
+  isPublished Boolean  @default(false)
+  ipfsHash    String?  @unique // For IPFS publishing
+  
+  // Stats
+  cardCount   Int      @default(0)
+  reviewCount Int      @default(0)
+  
+  // Ownership
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+  
+  // Relations
+  cards       Card[]
+  progress    DeckProgress[]
+  
+  @@index([userId])
+  @@index([language])
+  @@index([isPublic])
+  @@index([ipfsHash])
+}
+
+model Card {
+  id       String  @id @default(cuid())
+  front    String  @db.Text // Question/prompt
+  back     String  @db.Text // Answer
+  hint     String? @db.Text
+  
+  // Optional fields for language learning
+  pronunciation String?
+  example       String? @db.Text
+  notes         String? @db.Text
+  
+  // Deck relationship
+  deckId   String
+  deck     Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  
+  // Position in deck
+  order    Int     @default(0)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  reviews   Review[]
+  
+  @@index([deckId])
+  @@index([deckId, order])
+}
+
+// ============================================
+// SPACED REPETITION & PROGRESS
+// ============================================
+
+model DeckProgress {
+  id              String   @id @default(cuid())
+  
+  // User & Deck
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deckId          String
+  deck            Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  
+  // Progress stats
+  cardsLearned    Int      @default(0)
+  cardsMastered   Int      @default(0)
+  totalReviews    Int      @default(0)
+  
+  // Completion
+  isCompleted     Boolean  @default(false)
+  completedAt     DateTime?
+  
+  // Timestamps
+  startedAt       DateTime @default(now())
+  lastReviewedAt  DateTime?
+  
+  @@unique([userId, deckId])
+  @@index([userId])
+  @@index([deckId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  
+  // User & Card
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  
+  // SM-2 Algorithm fields
+  quality   Int      // 0-5 (0=complete blackout, 5=perfect response)
+  easeFactor Float   @default(2.5) // Ease factor (2.5 is default)
+  interval  Int      @default(1)   // Days until next review
+  repetitions Int    @default(0)   // Number of consecutive correct answers
+  
+  // Next review date
+  nextReviewAt DateTime
+  
+  // Timestamps
+  reviewedAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([cardId])
+  @@index([userId, nextReviewAt])
+  @@index([nextReviewAt])
+}
+
+// ============================================
+// ACHIEVEMENTS & BLOCKCHAIN
+// ============================================
+
+model Achievement {
+  id          String   @id @default(cuid())
+  
+  // User
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Achievement details
+  type        String   // e.g., "deck_completed", "streak_7", "reviews_100"
+  title       String
+  description String
+  icon        String?
+  
+  // Blockchain attestation
+  isOnChain   Boolean  @default(false)
+  attestationId String? @unique // EAS attestation UID
+  txHash      String?  @unique // Transaction hash
+  chainId     Int?     // Chain ID (e.g., 11155111 for Sepolia)
+  
+  // Metadata
+  metadata    Json?    // Additional data
+  
+  // Timestamps
+  earnedAt    DateTime @default(now())
+  attestedAt  DateTime?
+  
+  @@index([userId])
+  @@index([type])
+  @@index([attestationId])
+}
+
+// ============================================
+// ENUMS (Optional - can be added later)
+// ============================================
+
+// enum DeckLevel {
+//   BEGINNER
+//   INTERMEDIATE
+//   ADVANCED
+//   NATIVE
+// }
+
+// enum AchievementType {
+//   DECK_COMPLETED
+//   STREAK_7
+//   STREAK_30
+//   REVIEWS_100
+//   REVIEWS_1000
+//   CARDS_MASTERED_50
+// }

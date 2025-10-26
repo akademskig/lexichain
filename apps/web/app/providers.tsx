@@ -5,12 +5,12 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./theme";
 
 export function Providers({
-    children,
+  children,
 }: Readonly<{ children: React.ReactNode }>) {
-    return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
+  );
 }

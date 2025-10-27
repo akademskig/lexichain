@@ -20,10 +20,17 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 
+interface QuizOption {
+  text: string;
+  isCorrect: boolean;
+}
+
 interface Card {
   id: string;
   front: string;
   back: string;
+  type: string;
+  quizOptions?: QuizOption[];
   pronunciation: string | null;
   example: string | null;
   hint: string | null;
@@ -46,6 +53,8 @@ export default function StudySessionPage() {
   const [deck, setDeck] = useState<Deck | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [showQuizResult, setShowQuizResult] = useState(false);
 
   // Fetch deck and cards from API
   useEffect(() => {
@@ -81,6 +90,11 @@ export default function StudySessionPage() {
     setIsFlipped(!isFlipped);
   };
 
+  const handleQuizAnswer = (optionIndex: number) => {
+    setSelectedAnswer(optionIndex);
+    setShowQuizResult(true);
+  };
+
   const handleQualityRating = async (quality: number) => {
     if (!currentCard) return;
 
@@ -103,6 +117,8 @@ export default function StudySessionPage() {
       setCurrentCardIndex(currentCardIndex + 1);
       setIsFlipped(false);
       setShowHint(false);
+      setSelectedAnswer(null);
+      setShowQuizResult(false);
     } else {
       setSessionComplete(true);
     }
@@ -295,115 +311,194 @@ export default function StudySessionPage() {
         />
       </Box>
 
-      {/* Flashcard */}
-      <Box
-        sx={{
-          perspective: "1000px",
-          mb: 4,
-          minHeight: 400,
-        }}
-      >
-        <motion.div
-          style={{
-            width: "100%",
-            height: "100%",
-            position: "relative",
-            transformStyle: "preserve-3d",
+      {/* Card Display - Flashcard or Quiz */}
+      {currentCard?.type === "quiz" ? (
+        /* Quiz Card */
+        <Card sx={{ mb: 4, minHeight: 400 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Chip label="Quiz" color="primary" sx={{ mb: 3 }} />
+            <Typography variant="h5" fontWeight={600} gutterBottom>
+              {currentCard?.front}
+            </Typography>
+
+            <Stack spacing={2} sx={{ mt: 4 }}>
+              {currentCard?.quizOptions?.map((option, index) => {
+                const isSelected = selectedAnswer === index;
+                const isCorrect = option.isCorrect;
+                const showResult = showQuizResult;
+
+                let buttonColor = "inherit";
+                let buttonVariant: "outlined" | "contained" = "outlined";
+
+                if (showResult && isSelected) {
+                  buttonColor = isCorrect ? "success" : "error";
+                  buttonVariant = "contained";
+                } else if (showResult && isCorrect) {
+                  buttonColor = "success";
+                  buttonVariant = "contained";
+                }
+
+                return (
+                  <Button
+                    key={`${currentCard.id}-option-${index}`}
+                    fullWidth
+                    variant={buttonVariant}
+                    size="large"
+                    onClick={() => !showQuizResult && handleQuizAnswer(index)}
+                    disabled={showQuizResult}
+                    sx={{
+                      justifyContent: "flex-start",
+                      textAlign: "left",
+                      py: 2,
+                      px: 3,
+                      ...(buttonColor === "success" && {
+                        bgcolor: "success.main",
+                        color: "white",
+                        "&:hover": { bgcolor: "success.dark" },
+                      }),
+                      ...(buttonColor === "error" && {
+                        bgcolor: "error.main",
+                        color: "white",
+                        "&:hover": { bgcolor: "error.dark" },
+                      }),
+                    }}
+                  >
+                    <Typography variant="body1">{option.text}</Typography>
+                  </Button>
+                );
+              })}
+            </Stack>
+
+            {showQuizResult && (
+              <Box sx={{ mt: 3, textAlign: "center" }}>
+                {currentCard?.quizOptions?.[selectedAnswer!]?.isCorrect ? (
+                  <Typography variant="h6" color="success.main">
+                    ✓ Correct!
+                  </Typography>
+                ) : (
+                  <Typography variant="h6" color="error.main">
+                    ✗ Incorrect. The correct answer is: {currentCard?.back}
+                  </Typography>
+                )}
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        /* Flashcard */
+        <Box
+          sx={{
+            perspective: "1000px",
+            mb: 4,
+            minHeight: 400,
           }}
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ duration: 0.6, type: "spring" }}
         >
-          {/* Front of card */}
-          <Card
-            onClick={() => !isFlipped && handleFlip()}
-            sx={{
-              position: "absolute",
+          <motion.div
+            style={{
               width: "100%",
-              minHeight: 400,
-              backfaceVisibility: "hidden",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background:
-                "linear-gradient(135deg, rgba(0,255,255,0.1) 0%, rgba(255,0,255,0.1) 100%)",
-              cursor: isFlipped ? "default" : "pointer",
-              pointerEvents: isFlipped ? "none" : "auto",
-              transition: "none",
-              "&:hover": {
-                transform: "none",
-              },
+              height: "100%",
+              position: "relative",
+              transformStyle: "preserve-3d",
             }}
+            animate={{ rotateY: isFlipped ? 180 : 0 }}
+            transition={{ duration: 0.6, type: "spring" }}
           >
-            <CardContent sx={{ textAlign: "center", width: "100%", p: 4 }}>
-              <Chip label="Question" color="primary" sx={{ mb: 3 }} />
-              <Typography variant="h3" fontWeight={700} gutterBottom>
-                {currentCard?.front}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-                Click to reveal answer
-              </Typography>
-            </CardContent>
-          </Card>
-
-          {/* Back of card */}
-          <Card
-            sx={{
-              position: "absolute",
-              width: "100%",
-              minHeight: 400,
-              backfaceVisibility: "hidden",
-              transform: "rotateY(180deg)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background:
-                "linear-gradient(135deg, rgba(255,0,255,0.1) 0%, rgba(0,255,255,0.1) 100%)",
-              pointerEvents: isFlipped ? "auto" : "none",
-              transition: "none",
-              "&:hover": {
-                transform: "rotateY(180deg)",
-              },
-            }}
-          >
-            <CardContent sx={{ textAlign: "center", width: "100%", p: 4 }}>
-              <Chip label="Answer" color="secondary" sx={{ mb: 3 }} />
-              <Typography variant="h3" fontWeight={700} gutterBottom>
-                {currentCard?.back}
-              </Typography>
-
-              {/* Pronunciation */}
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="center"
-                spacing={1}
-                sx={{ mt: 2 }}
-              >
-                <IconButton size="small" onClick={handlePronunciation}>
-                  <VolumeUp />
-                </IconButton>
-                <Typography variant="body2" color="text.secondary">
-                  {currentCard?.pronunciation}
+            {/* Front of card */}
+            <Card
+              onClick={() => !isFlipped && handleFlip()}
+              sx={{
+                position: "absolute",
+                width: "100%",
+                minHeight: 400,
+                backfaceVisibility: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background:
+                  "linear-gradient(135deg, rgba(0,255,255,0.1) 0%, rgba(255,0,255,0.1) 100%)",
+                cursor: isFlipped ? "default" : "pointer",
+                pointerEvents: isFlipped ? "none" : "auto",
+                transition: "none",
+                "&:hover": {
+                  transform: "none",
+                },
+              }}
+            >
+              <CardContent sx={{ textAlign: "center", width: "100%", p: 4 }}>
+                <Chip label="Question" color="primary" sx={{ mb: 3 }} />
+                <Typography variant="h3" fontWeight={700} gutterBottom>
+                  {currentCard?.front}
                 </Typography>
-              </Stack>
-
-              {/* Example */}
-              {currentCard?.example && (
                 <Typography
                   variant="body1"
                   color="text.secondary"
-                  sx={{ mt: 3, fontStyle: "italic" }}
+                  sx={{ mt: 2 }}
                 >
-                  &quot;{currentCard?.example}&quot;
+                  Click to reveal answer
                 </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </Box>
+              </CardContent>
+            </Card>
+
+            {/* Back of card */}
+            <Card
+              sx={{
+                position: "absolute",
+                width: "100%",
+                minHeight: 400,
+                backfaceVisibility: "hidden",
+                transform: "rotateY(180deg)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background:
+                  "linear-gradient(135deg, rgba(255,0,255,0.1) 0%, rgba(0,255,255,0.1) 100%)",
+                pointerEvents: isFlipped ? "auto" : "none",
+                transition: "none",
+                "&:hover": {
+                  transform: "rotateY(180deg)",
+                },
+              }}
+            >
+              <CardContent sx={{ textAlign: "center", width: "100%", p: 4 }}>
+                <Chip label="Answer" color="secondary" sx={{ mb: 3 }} />
+                <Typography variant="h3" fontWeight={700} gutterBottom>
+                  {currentCard?.back}
+                </Typography>
+
+                {/* Pronunciation */}
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  spacing={1}
+                  sx={{ mt: 2 }}
+                >
+                  <IconButton size="small" onClick={handlePronunciation}>
+                    <VolumeUp />
+                  </IconButton>
+                  <Typography variant="body2" color="text.secondary">
+                    {currentCard?.pronunciation}
+                  </Typography>
+                </Stack>
+
+                {/* Example */}
+                {currentCard?.example && (
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ mt: 3, fontStyle: "italic" }}
+                  >
+                    &quot;{currentCard?.example}&quot;
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </Box>
+      )}
 
       {/* Hint Button */}
-      {!isFlipped && currentCard?.hint && (
+      {!isFlipped && !showQuizResult && currentCard?.hint && (
         <Box sx={{ textAlign: "center", mb: 3 }}>
           <Button
             startIcon={<Lightbulb />}
@@ -434,7 +529,7 @@ export default function StudySessionPage() {
       )}
 
       {/* Quality Rating Buttons (SM-2) */}
-      {isFlipped && (
+      {(isFlipped || showQuizResult) && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

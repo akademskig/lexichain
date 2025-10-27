@@ -233,6 +233,12 @@ model Card {
   back  String  @db.Text // Answer
   hint  String? @db.Text
 
+  // Card type: "flashcard" or "quiz"
+  type String @default("flashcard") // "flashcard" | "quiz"
+
+  // Quiz-specific fields (only used when type = "quiz")
+  quizOptions Json? // Array of 4 options: [{ text: string, isCorrect: boolean }]
+
   // Optional fields for language learning
   pronunciation String?
   example       String? @db.Text
@@ -254,6 +260,7 @@ model Card {
 
   @@index([deckId])
   @@index([deckId, order])
+  @@index([type])
 }
 
 // ============================================

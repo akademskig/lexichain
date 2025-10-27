@@ -15,13 +15,15 @@ Brand Style: **Neon Futuristic** (dark-mode first)
 🎯 Goal: A fully usable learning app with verifiable progress
 
 ### Completed ✅
+
 - ✅ Neon futuristic UI theme (Material UI v7)
 - ✅ Database schema with Prisma + PostgreSQL (Docker)
 - ✅ Course/Section/Deck hierarchy (strict - no standalone decks)
 - ✅ Enrollment system with progress tracking
 - ✅ Dashboard with enrolled courses
 - ✅ Course browsing page with enrollment indicators
-- ✅ Study session interface with flashcards
+- ✅ Study session interface with flashcards & quiz cards
+- ✅ Quiz cards with multiple choice (4 options)
 - ✅ SM-2 Spaced Repetition System (basic implementation)
 - ✅ Web Speech API for pronunciation
 - ✅ Experience/Level system
@@ -29,6 +31,7 @@ Brand Style: **Neon Futuristic** (dark-mode first)
 - ✅ Reusable CourseCard component
 
 ### In Progress 🚧
+
 - Auth: Email/passkey onboarding + optional wallet
 - Module completion → on-chain badge or EAS attestation (gasless)
 - IPFS deck publishing
